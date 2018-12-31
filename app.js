@@ -1,26 +1,24 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+let indexRouter = require('./routes/index');
+let usersRouter = require('./routes/users');
+let getDataRouter = require('./routes/get-data');
 
-var app = express();
+let app = express();
 
-var mongoose = require("mongoose");
+const assert = require('assert');
+const MongoClient = require('mongodb').MongoClient;
+const objectId = require('mongodb').ObjectId;
+const url = 'mongodb://localhost:27017';
+const dbName = 'crudDemo';
+const client = new MongoClient(url);
 
-mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/crud-demo");
 
-var postSchema = new mongoose.Schema({
- name: String,
- postbody: String
-});
-var post = mongoose.model("Post", postSchema);
-
-var bodyParser = require('body-parser');
+let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -38,26 +36,56 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 // get those post its
-app.get('/get-data', (req, res) => {
-  db.collection()
-});
+app.use('/', getDataRouter);
 
 // Post it action
-app.post('/create', (req, res) => {
-  var postItData = new post(req.body);
-  postItData.insert().then(item => {
-    res.render('post-it', { title: 'THE END OF LOVE', crud: 'CRUD v.2' });
-  }).catch(err => {
-    res.status(400).send('cant save the post it doof');
+app.post('/create', (req, res, next) => {
+  let post = {
+     name: req.body.name,
+     postbody: req.body.postbody,
+  };
+  client.connect((err) => {
+    assert.equal(null, err);
+    console.log("Connected successfully to server");
+    const db = client.db(dbName);
+    db.collection('postIts').insertOne(post, (result) => {
+      console.log(post);
+      console.log('post it connected');
+    });
   });
+  res.redirect('/get-data');
 });
 
-app.post('/update', () => {
+app.post('/update', (req, res, next) => {
+  let post = {
+     name: req.body.name,
+     postbody: req.body.postbody,
+  };
+  let id = req.body.id;
 
+  client.connect((err) => {
+    assert.equal(null, err);
+    console.log("Connected successfully to server");
+    const db = client.db(dbName);
+    db.collection('postIts').updateOne({'_id': objectId(id)}, {$set: post}, (result) => {
+      console.log('updated');
+      console.log('post it connected');
+    });
+  });
+  res.redirect('/get-data');
 });
 
-app.post('/delete', () => {
+app.post('/delete', (req, res, next) => {
+  let id = req.body.id;
 
+  client.connect((err) => {
+    const db = client.db(dbName);
+    db.collection('postIts').deleteOne ({'_id': objectId(id)}, (result) => {
+      console.log('deleted');
+      console.log('post it connected');
+    });
+  });
+  res.redirect('/get-data');
 });
 
 // catch 404 and forward to error handler

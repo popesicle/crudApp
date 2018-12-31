@@ -1,7 +1,7 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
-<div id="main-container">
-  <p>{{crud}}</p>
+<div>
+<div id="create-container">
   <form class="post-it-form" action="/create" method="post">
     <label>Make a Donk</label>
     <input type="text" name="postbody" placeholder="Place your donks here" required />
@@ -9,4 +9,39 @@
     <input type="text" name="name" required>
     <input type="submit" value="Donk it up">
   </form>
+</div>
+<div id="update-get">
+  <div id="get-container">
+    <a href='/get-data'>GET THAT DATA</a>
+
+    {{# each posts }}
+      <div class="post" data-id="{{this._id}}">
+        <div class="post-body">
+          <p>{{this.postbody}}</p>
+        </div>
+        <div>
+          <p>by: <span class="author">{{this.name}}</span></p>
+          <button class="update">Update</button>
+          <form action=/delete method="post">
+            <div class="hidden">
+              <input name="id" value="{{this._id}}">
+            </div>
+            <input type=submit class="destroy" value="Destroy">
+          </form>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+  <div id="update-container">
+    <form class="update-form" action="/update" method="post">
+      <label>Change a Donk</label>
+      <input type="text" name="postbody" placeholder="Place your donks here" required />
+      <label>Who put a donk on it</label>
+      <div class="hidden">
+        <input type="text" name="id" required>
+      </div>
+      <input type="text" name="name" required>
+      <input type="submit" value="Double Donk it up">
+    </form>
+  </div>
 </div>

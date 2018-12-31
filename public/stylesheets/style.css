@@ -1,12 +1,35 @@
 body {
   padding: 50px;
+  width: 1100px;
+  margin: auto;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
 
 a {
-  color: #00B7FF; }
+  display: inline-block;
+  color: #00B7FF;
+  margin: 45px 0; }
 
 .post-it-form input {
   display: block; }
 
+.hidden {
+  display: none; }
+
 .farts {
   color: white; }
+
+#get-container {
+  float: left; }
+  #get-container .post {
+    width: 360px;
+    padding: 15px;
+    height: 175px;
+    border-radius: 15px;
+    background-color: violet;
+    border: 1px solid purple;
+    font-family: 'FreeMono'; }
+    #get-container .post .post-body {
+      height: 90px; }
+
+#update-container {
+  float: right; }
